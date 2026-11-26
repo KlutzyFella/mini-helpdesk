@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import type { ErrorCode, ErrorDetail } from "./errors.js";
+import type { ErrorCode, ErrorDetail } from "./errors.ts";
 
 export type Meta = Record<string, unknown>;
 

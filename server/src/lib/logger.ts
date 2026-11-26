@@ -1,4 +1,4 @@
 import { pino } from "pino";
-import { config } from "../config/env.js";
+import { config } from "../config/env.ts";
 
 export const logger = pino({ level: config.LOG_LEVEL, redact: ["req.headers.authorization"] });
