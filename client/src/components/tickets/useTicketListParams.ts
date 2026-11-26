@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { CATEGORIES, PRIORITIES, STATUSES } from "../../lib/enums";
 import type { TicketFilterValues } from "./TicketFilters";
@@ -46,6 +46,22 @@ export function useTicketListParams() {
   const sort = oneOf(SORTS, params.get("sort")) || undefined;
   const order = oneOf(ORDERS, params.get("order")) || undefined;
 
+  // setParams(prev => ...) hands over the params of the last render, so a second change made
+  // before React re-renders would drop the first. Build every change on the latest URL instead.
+  const latest = useRef(params);
+  useLayoutEffect(() => {
+    latest.current = params;
+  }, [params]);
+
+  const update = useCallback(
+    (changes: Record<string, string>, resetPage: boolean, replace = false) => {
+      const next = withParams(latest.current, changes, resetPage);
+      latest.current = next;
+      setParams(next, { replace });
+    },
+    [setParams],
+  );
+
   // The input is local so typing is instant; the URL (and the query) follow 300 ms later.
   const [searchInput, setSearchInput] = useState(urlSearch);
   const debouncedSearch = useDebounced(searchInput, SEARCH_DEBOUNCE_MS);
@@ -59,26 +75,26 @@ export function useTicketListParams() {
     }
   }, [urlSearch]);
 
+  // update changes identity on every URL change, so this effect re-runs then too.
+  // Navigating only when the search changed keeps it from writing back a stale URL.
   useEffect(() => {
+    if (debouncedSearch === pushedSearch.current) return;
     pushedSearch.current = debouncedSearch;
-    setParams(
-      (prev) => ((prev.get("search") ?? "") === debouncedSearch ? prev : withParams(prev, { search: debouncedSearch }, true)),
-      { replace: true },
-    );
-  }, [debouncedSearch, setParams]);
+    update({ search: debouncedSearch }, true, true);
+  }, [debouncedSearch, update]);
 
   function setFilters(change: Partial<TicketFilterValues>) {
     const { search, ...selects } = change;
     if (search !== undefined) setSearchInput(search);
-    if (Object.keys(selects).length > 0) setParams((prev) => withParams(prev, selects as Record<string, string>, true));
+    if (Object.keys(selects).length > 0) update(selects as Record<string, string>, true);
   }
 
   function setSorting(change: { sort?: SortKey; order?: SortOrder }) {
-    setParams((prev) => withParams(prev, change as Record<string, string>, true));
+    update(change as Record<string, string>, true);
   }
 
   function goToPage(next: number) {
-    setParams((prev) => withParams(prev, { page: next > 1 ? String(next) : "" }, false));
+    update({ page: next > 1 ? String(next) : "" }, false);
   }
 
   const query: ListParams = { ...filters, search: urlSearch || undefined, sort, order, page };
