@@ -5,6 +5,7 @@ import { createActivityRouter } from "./modules/activity/activity.routes.ts";
 import { createAuthRouter } from "./modules/auth/auth.routes.ts";
 import { createCommentsRouter } from "./modules/comments/comments.routes.ts";
 import { createNotificationsRouter } from "./modules/notifications/notifications.routes.ts";
+import { createStatsRouter } from "./modules/stats/stats.routes.ts";
 import { createTicketsRouter } from "./modules/tickets/tickets.routes.ts";
 
 export function createRouter(config: Config): Router {
@@ -15,5 +16,6 @@ export function createRouter(config: Config): Router {
   router.use("/api", createCommentsRouter());
   router.use("/api", createActivityRouter());
   router.use("/api", createNotificationsRouter());
+  router.use("/api", createStatsRouter());
   return router;
 }

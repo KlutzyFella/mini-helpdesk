@@ -168,7 +168,7 @@ cd client && npm test
 
 Server coverage from `cd server && npx vitest run --coverage` is 95.5% of statements, 89.1% of branches, and 96.8% of lines, over the server files the tests load. `src/server.ts`, which only starts the listener, is not loaded.
 
-`docs/helpdesk.postman_collection.json` is the smoke suite: 27 requests with assertions on each one. A newman run of the full collection against the live API passed every request and assertion. See [running the Postman collection](docs/API.md#run-the-postman-collection) for the command.
+`docs/helpdesk.postman_collection.json` is the smoke suite: 30 requests with assertions on each one. A newman run of the full collection against the live API passed every request and assertion. See [running the Postman collection](docs/API.md#run-the-postman-collection) for the command.
 
 ## Implementation decisions
 
