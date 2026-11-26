@@ -30,7 +30,7 @@ The API runs on Render's free tier in Singapore, and the database is Neon Postgr
 | 4 Events | Five event types: `TICKET_CREATED`, `TICKET_UPDATED`, `STATUS_CHANGED`, `TICKET_RESOLVED`, and `COMMENT_ADDED`. Two subscribers write the activity log and the notifications. Each ticket page shows its activity timeline, and a bell in the header shows each user's unread notifications. |
 | 6 Bonus | Search, pagination, sorting, and filtering on the ticket list. An admin stats dashboard with counts by status, priority, and category, and the mean time to resolve. 183 automated tests and a Postman collection. A React frontend. CI on GitHub Actions. |
 
-Docker runs only the local Postgres. Email notifications were not built.
+`docker compose up --build` runs the whole app: Postgres, the API, and the client. Email notifications were not built.
 
 ## Tech stack
 
@@ -89,9 +89,29 @@ sequenceDiagram
 	Svc-->>Admin: 200 with the ticket and its permissions
 ```
 
+## Run everything with Docker
+
+You need Docker. From the repository root:
+
+1. Create the server's `.env` and set `JWT_SECRET` (at least 32 characters) and `ADMIN_PASSWORD` in it. Compose reads this file. It replaces `DATABASE_URL`, `NODE_ENV`, `PORT`, and `CORS_ORIGINS` with values for the containers.
+
+	```sh
+	cp server/.env.example server/.env
+	```
+
+2. Build and start Postgres, the API, and the client.
+
+	```sh
+	docker compose up --build
+	```
+
+3. Open the client at http://localhost:8080. The API is at http://localhost:4000. Sign in with the `ADMIN_EMAIL` and `ADMIN_PASSWORD` from `server/.env`, or as `alice@example.com` with `Password123!`.
+
+The API container migrates and seeds the database on every start, as the Render service does. The seed is safe to repeat. To start over from an empty database, run `docker compose down -v`, which deletes the data volume.
+
 ## Local setup
 
-You need Node.js 24 and Docker.
+You need Node.js 24 and Docker. The API and client run on your machine, and only Postgres runs in Docker. If the full Docker stack is running, stop it first with `docker compose stop server client`, because the API dev server also uses port 4000.
 
 1. From the repository root, start Postgres. The init script also creates the `helpdesk_test` database.
 
