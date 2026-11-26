@@ -12,7 +12,9 @@
     "start": "node dist/server.js",
     "postinstall": "prisma generate",
     "test": "vitest run",
-    "typecheck": "tsc -p tsconfig.check.json"
+    "typecheck": "tsc -p tsconfig.check.json",
+    "seed": "node dist/scripts/seed.js",
+    "seed:dev": "tsx src/scripts/seed.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "7.10.1",

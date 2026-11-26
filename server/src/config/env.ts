@@ -15,6 +15,7 @@ const schema = z.object({
     .transform((v) => v.split(",").map((s) => s.trim()).filter(Boolean)),
   ADMIN_EMAIL: z.string().optional(),
   ADMIN_PASSWORD: z.string().optional(),
+  DEMO_PASSWORD: z.string().min(8).default("Password123!"),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
 });
 
