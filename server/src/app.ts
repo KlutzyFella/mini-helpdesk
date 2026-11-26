@@ -16,7 +16,7 @@ export function createApp(config: Config, mountExtra?: (app: Express) => void): 
   app.use(helmet());
   app.use(cors({ origin: config.CORS_ORIGINS }));
   app.use(express.json({ limit: "100kb" }));
-  app.use(createRouter());
+  app.use(createRouter(config));
   mountExtra?.(app);
   app.use(notFound);
   app.use(errorHandler);
