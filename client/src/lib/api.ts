@@ -82,6 +82,8 @@ export async function apiFetch<T, M = unknown>(
     throw new ApiError(0, "NETWORK_ERROR", "Could not reach the server");
   }
 
+  if (res.status === 204) return { data: undefined as T, meta: null };
+
   let payload: Envelope<T, M> | null = null;
   try {
     payload = (await res.json()) as Envelope<T, M>;

@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { ApiError, apiFetch } from "../../lib/api";
+import { apiFetch } from "../../lib/api";
 import type { ActivityView, CommentView, ListMeta, TicketCategory, TicketPriority, TicketView } from "../../lib/types";
 
 export interface ListParams {
@@ -37,14 +37,8 @@ export const updateTicket = (id: string, body: Partial<Pick<NewTicket, "title" |
 export const postComment = (id: string, body: string) =>
   apiFetch<CommentView>(`/api/tickets/${id}/comments`, { method: "POST", body: { body } }).then((r) => r.data);
 
-// The API answers DELETE with 204 and no body, which apiFetch reports as an ApiError with status 204.
-export async function deleteTicket(id: string): Promise<void> {
-  try {
-    await apiFetch(`/api/tickets/${id}`, { method: "DELETE" });
-  } catch (err) {
-    if (!(err instanceof ApiError && err.status === 204)) throw err;
-  }
-}
+export const deleteTicket = (id: string): Promise<void> =>
+  apiFetch<void>(`/api/tickets/${id}`, { method: "DELETE" }).then(() => undefined);
 
 // Invalidates every cache a ticket change can touch. PR9's admin controls call it after their PATCH.
 export function useInvalidateTicket() {

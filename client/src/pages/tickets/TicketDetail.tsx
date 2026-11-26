@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useParams } from "react-router";
 import { ActivityTimeline } from "../../components/tickets/ActivityTimeline";
 import { CommentThread } from "../../components/tickets/CommentThread";
@@ -26,6 +26,7 @@ export function TicketDetail({ adminControls, backTo = "/tickets", backLabel = "
   const { id = "" } = useParams();
   const navigate = useNavigate();
   const invalidate = useInvalidateTicket();
+  const queryClient = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
@@ -37,9 +38,9 @@ export function TicketDetail({ adminControls, backTo = "/tickets", backLabel = "
 
   const remove = useMutation({
     mutationFn: () => deleteTicket(id),
-    onSuccess: async () => {
-      // Skip refetching the deleted ticket: drop its caches, refresh the list, then leave.
-      await invalidate(id).catch(() => undefined);
+    onSuccess: () => {
+      for (const key of ["ticket", "comments", "activity"]) queryClient.removeQueries({ queryKey: [key, id] });
+      void queryClient.invalidateQueries({ queryKey: ["tickets"] });
       navigate(backTo);
     },
     onError: () => invalidate(id),

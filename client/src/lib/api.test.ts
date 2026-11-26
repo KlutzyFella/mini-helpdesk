@@ -36,3 +36,10 @@ describe("apiFetch 401 handling", () => {
     expect(handler).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("apiFetch with an empty 204", () => {
+  it("resolves with no data instead of throwing", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(null, { status: 204 })));
+    await expect(apiFetch("/api/tickets/t1", { method: "DELETE" })).resolves.toEqual({ data: undefined, meta: null });
+  });
+});
