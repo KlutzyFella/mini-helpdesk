@@ -1,0 +1,16 @@
+node_modules/
+dist/
+coverage/
+.env
+.env.local
+server/src/generated/
+*.log
+.DS_Store
+*:Zone.Identifier
+
+# Local planning files, kept out of the submission
+Assignment.pdf
+PLAN.md
+plan-review/
+.audit/
+todo.md
