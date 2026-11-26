@@ -207,3 +207,13 @@ describe("seed", () => {
     await expect(seed({ ...config, ADMIN_EMAIL: undefined, ADMIN_PASSWORD: undefined })).rejects.toThrow(/ADMIN_EMAIL/);
   });
 });
+
+describe("login password rules", () => {
+  it("returns 401, not 400, for a short wrong password", async () => {
+    const res = await request(createApp(config))
+      .post("/api/auth/login")
+      .send({ email: "nobody@example.com", password: "x" });
+    expect(res.status).toBe(401);
+    expect(res.body.error.code).toBe("INVALID_CREDENTIALS");
+  });
+});

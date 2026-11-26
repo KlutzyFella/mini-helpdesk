@@ -10,7 +10,7 @@ const password = z
 const name = z.string().trim().min(1).max(80);
 
 export const registerBody = z.strictObject({ name, email, password });
-export const loginBody = z.strictObject({ email, password });
+export const loginBody = z.strictObject({ email, password: z.string().min(1).max(1024) });
 
 export type RegisterBody = z.infer<typeof registerBody>;
 export type LoginBody = z.infer<typeof loginBody>;

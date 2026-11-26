@@ -26,11 +26,10 @@ const SAMPLE_TICKETS: SampleTicket[] = [
 ];
 
 export async function seed(cfg: Config = defaultConfig): Promise<void> {
-  const { ADMIN_EMAIL, ADMIN_PASSWORD } = cfg;
+  const { ADMIN_EMAIL, ADMIN_PASSWORD, DEMO_PASSWORD: demoPassword } = cfg;
   if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
     throw new Error("ADMIN_EMAIL and ADMIN_PASSWORD must be set to run the seed");
   }
-  const demoPassword = process.env.DEMO_PASSWORD || "Password123!";
 
   const upsert = async (name: string, email: string, password: string, role: Role) => {
     const passwordHash = await hashPassword(password);
