@@ -203,7 +203,7 @@ Server coverage from `cd server && npx vitest run --coverage` is 95.5% of statem
 - A token cannot be revoked before it expires. The fix is a `tokenVersion` column on `users`, put in the token and checked by `authenticate`. It is not built.
 - The free Render service sleeps when idle, so the first request after a pause can take up to about a minute.
 - `npm audit` in `server/` reports 3 high-severity advisories in `effect`, a dependency of the Prisma CLI's config loader. That code runs only at build and migrate time, and the only fix is a downgrade to Prisma 6.
-- Email notifications and the stats dashboard were not built. The admin **Dashboard** link opens a placeholder page.
+- Email notifications and the stats dashboard were not built. `/admin` redirects to the ticket list.
 
 ## More documentation
 
