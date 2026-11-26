@@ -59,5 +59,6 @@ export function useInvalidateTicket() {
       qc.invalidateQueries({ queryKey: ["comments", id] }),
       qc.invalidateQueries({ queryKey: ["activity", id] }),
       qc.invalidateQueries({ queryKey: ["tickets"] }),
+      qc.invalidateQueries({ queryKey: ["stats"] }),
     ]);
 }

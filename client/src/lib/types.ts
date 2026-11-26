@@ -78,3 +78,11 @@ export interface ActivityView {
   createdAt: string;
   actor: { id: string; name: string; role: Role };
 }
+
+export interface TicketStats {
+  total: number;
+  byStatus: Record<TicketStatus, number>;
+  byPriority: Record<TicketPriority, number>;
+  byCategory: Record<TicketCategory, number>;
+  avgResolutionHours: number | null;
+}

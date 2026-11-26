@@ -28,9 +28,9 @@ The API runs on Render's free tier in Singapore, and the database is Neon Postgr
 | 3C Admin | An ADMIN lists every ticket, filters by status, priority, and category, reads any ticket with its comments, and changes status and priority along a fixed transition table. |
 | 3D Comments | The owner and any admin comment on a ticket. Each comment stores its ticket and its author. A `CLOSED` ticket takes no new comments. |
 | 4 Events | Five event types: `TICKET_CREATED`, `TICKET_UPDATED`, `STATUS_CHANGED`, `TICKET_RESOLVED`, and `COMMENT_ADDED`. Two subscribers write the activity log and the notifications. Each ticket page shows its activity timeline. |
-| 6 Bonus | Search, pagination, sorting, and filtering on the ticket list. 168 automated tests and a Postman collection. A React frontend. CI on GitHub Actions. |
+| 6 Bonus | Search, pagination, sorting, and filtering on the ticket list. An admin stats dashboard with counts by status, priority, and category, and the mean time to resolve. 176 automated tests and a Postman collection. A React frontend. CI on GitHub Actions. |
 
-Docker runs only the local Postgres. The stats dashboard, email notifications, and a notification bell in the client were not built. The notification API exists, but the client does not show it.
+Docker runs only the local Postgres. Email notifications and a notification bell in the client were not built. The notification API exists, but the client does not show it.
 
 ## Tech stack
 
@@ -203,7 +203,7 @@ Server coverage from `cd server && npx vitest run --coverage` is 95.5% of statem
 - A token cannot be revoked before it expires. The fix is a `tokenVersion` column on `users`, put in the token and checked by `authenticate`. It is not built.
 - The free Render service sleeps when idle, so the first request after a pause can take up to about a minute.
 - `npm audit` in `server/` reports 3 high-severity advisories in `effect`, a dependency of the Prisma CLI's config loader. That code runs only at build and migrate time, and the only fix is a downgrade to Prisma 6.
-- Email notifications and the stats dashboard were not built. `/admin` redirects to the ticket list.
+- Email notifications were not built.
 
 ## More documentation
 
