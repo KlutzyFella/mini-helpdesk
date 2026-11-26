@@ -8,7 +8,7 @@ Database: PostgreSQL 17 in the compose container. Plans use EXPLAIN (ANALYZE, BU
 
 Summary
 With the (status, priority, createdAt) index present, the planner still chose a backward scan of the plain createdAt index plus an incremental sort on id, and filtered out 315 rows to find 20 matches.
-Without the composite index the plan is identical and takes 0.09 ms against 0.20 ms, so at 5,000 rows the composite index does not change the plan, and the first run's extra time is cold-cache noise, not a real difference.
+Without the composite index the plan is identical and takes 0.09 ms against 0.20 ms, so at 5,000 rows the composite index does not change the plan. The extra time in the first run is most likely cold-cache and planning overhead (inferred from Planning Buffers 171 against 5).
 
 === WITH INDEX ===
                                                                          QUERY PLAN                                                                          
