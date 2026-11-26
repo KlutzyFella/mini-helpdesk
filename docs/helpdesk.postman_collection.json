@@ -1,0 +1,30 @@
+{
+  "info": {
+    "name": "Mini Helpdesk",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [{ "key": "baseUrl", "value": "http://localhost:4000" }],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": { "method": "GET", "url": "{{baseUrl}}/health" },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('success is true', function () { pm.expect(pm.response.json().success).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

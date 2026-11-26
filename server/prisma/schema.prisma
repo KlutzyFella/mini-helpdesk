@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum TicketCategory {
+  BUG
+  BILLING
+  ACCOUNT
+  FEATURE_REQUEST
+  OTHER
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum EventType {
+  TICKET_CREATED
+  TICKET_UPDATED
+  STATUS_CHANGED
+  TICKET_RESOLVED
+  COMMENT_ADDED
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String   @db.VarChar(80)
+  email        String   @unique @db.VarChar(254)
+  passwordHash String
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
+
+  tickets       Ticket[]
+  comments      Comment[]
+  activityLogs  ActivityLog[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+model Ticket {
+  id          String         @id @default(uuid()) @db.Uuid
+  title       String         @db.VarChar(120)
+  description String         @db.VarChar(5000)
+  category    TicketCategory
+  priority    TicketPriority @default(MEDIUM)
+  status      TicketStatus   @default(OPEN)
+  createdById String         @db.Uuid
+  resolvedAt  DateTime?      @db.Timestamptz(3)
+  createdAt   DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime       @updatedAt @db.Timestamptz(3)
+
+  createdBy     User           @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  comments      Comment[]
+  activityLogs  ActivityLog[]
+  notifications Notification[]
+
+  @@index([createdById, createdAt])
+  @@index([status, priority, createdAt])
+  @@index([createdAt])
+  @@map("tickets")
+}
+
+model Comment {
+  id        String   @id @default(uuid()) @db.Uuid
+  ticketId  String   @db.Uuid
+  authorId  String   @db.Uuid
+  body      String   @db.VarChar(2000)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author User   @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([ticketId, createdAt])
+  @@map("comments")
+}
+
+model ActivityLog {
+  id        Int       @id @default(autoincrement())
+  ticketId  String    @db.Uuid
+  actorId   String    @db.Uuid
+  type      EventType
+  metadata  Json?
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  actor  User   @relation(fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([ticketId, id])
+  @@map("activity_logs")
+}
+
+model Notification {
+  id          String    @id @default(uuid()) @db.Uuid
+  recipientId String    @db.Uuid
+  ticketId    String    @db.Uuid
+  type        EventType
+  message     String
+  readAt      DateTime? @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+
+  recipient User   @relation(fields: [recipientId], references: [id], onDelete: Restrict)
+  ticket    Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId, readAt, createdAt])
+  @@map("notifications")
+}
