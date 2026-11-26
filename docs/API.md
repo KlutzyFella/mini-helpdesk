@@ -100,6 +100,7 @@ Each request runs its checks in a fixed order, and the first failure decides the
 | POST | `/api/tickets/:id/comments` | the owner or an ADMIN |
 | GET | `/api/tickets/:id/activity` | the owner or an ADMIN |
 | GET | `/api/notifications` | any signed-in user |
+| PATCH | `/api/notifications/read-all` | any signed-in user |
 | PATCH | `/api/notifications/:id/read` | the recipient |
 | GET | `/api/admin/stats` | ADMIN |
 
@@ -374,6 +375,18 @@ Returns `200` with the caller's newest 20 notifications. `meta.unreadCount` coun
 ```
 
 Errors: `UNAUTHENTICATED`.
+
+### `PATCH /api/notifications/read-all`
+
+Marks every unread notification of the caller's that was created at or before `before` as read, including ones older than the newest 20. Pass the `createdAt` of the newest notification you showed, so one that arrives in the meantime stays unread. A second call returns `{ "updated": 0 }`.
+
+```json
+{ "before": "2026-11-26T12:25:08.967Z" }
+```
+
+Success: `200` with `{ "updated": <count> }`.
+
+Errors: `UNAUTHENTICATED`, `VALIDATION_ERROR` when `before` is missing or not an ISO date-time.
 
 ### `PATCH /api/notifications/:id/read`
 

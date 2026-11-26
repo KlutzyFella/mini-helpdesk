@@ -35,3 +35,11 @@ export async function markRead(actor: Actor, id: string) {
   if (!row) throw new AppError("NOT_FOUND", "Notification not found");
   return row;
 }
+
+export async function readAll(actor: Actor, before: Date): Promise<number> {
+  const { count } = await prisma.notification.updateMany({
+    where: { recipientId: actor.id, readAt: null, createdAt: { lte: before } },
+    data: { readAt: new Date() },
+  });
+  return count;
+}

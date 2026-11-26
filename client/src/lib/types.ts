@@ -86,3 +86,12 @@ export interface TicketStats {
   byCategory: Record<TicketCategory, number>;
   avgResolutionHours: number | null;
 }
+
+export interface NotificationView {
+  id: string;
+  type: ActivityType;
+  message: string;
+  readAt: string | null;
+  createdAt: string;
+  ticket: { id: string; title: string };
+}

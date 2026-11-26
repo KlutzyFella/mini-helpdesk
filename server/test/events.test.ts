@@ -240,6 +240,26 @@ describe("notifications API", () => {
     expect((await as(alice).patch("/api/notifications/nope/read")).status).toBe(404);
     expect((await request(app).patch(`/api/notifications/${n.id}/read`)).status).toBe(401);
   });
+
+  it("read-all marks every unread one up to the cutoff, past the newest 20, and only the caller's", async () => {
+    const t = await createTicket(alice.user.id);
+    await seed(t.id, alice.user.id, 25);
+    await seed(t.id, bob.user.id, 2);
+    const cutoff = "2026-01-01T00:00:22.000Z";
+    const res = await as(alice).patch("/api/notifications/read-all", { before: cutoff });
+    expect(res.status).toBe(200);
+    expect(res.body.data).toEqual({ updated: 23 });
+    expect((await as(alice).get("/api/notifications")).body.meta).toEqual({ unreadCount: 2 });
+    expect((await as(bob).get("/api/notifications")).body.meta).toEqual({ unreadCount: 2 });
+    const again = await as(alice).patch("/api/notifications/read-all", { before: cutoff });
+    expect(again.body.data).toEqual({ updated: 0 });
+  });
+
+  it("read-all rejects a missing or malformed cutoff and requires auth", async () => {
+    expect((await as(alice).patch("/api/notifications/read-all", {})).status).toBe(400);
+    expect((await as(alice).patch("/api/notifications/read-all", { before: "yesterday" })).status).toBe(400);
+    expect((await request(app).patch("/api/notifications/read-all").send({ before: "2026-01-01T00:00:00.000Z" })).status).toBe(401);
+  });
 });
 
 describe("failure isolation and cascade", () => {
