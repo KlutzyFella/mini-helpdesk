@@ -2,6 +2,8 @@ import { Navigate, Route, Routes } from "react-router";
 import { useAuth } from "./auth/AuthContext";
 import { RequireAuth, RequireRole, homeFor } from "./auth/guards";
 import { Layout } from "./components/Layout";
+import { AdminTicketDetail } from "./pages/admin/AdminTicketDetail";
+import { AdminTickets } from "./pages/admin/AdminTickets";
 import { Login } from "./pages/Login";
 import { Placeholder } from "./pages/Placeholder";
 import { Register } from "./pages/Register";
@@ -30,7 +32,8 @@ export function App() {
           </Route>
           <Route element={<RequireRole role="ADMIN" />}>
             <Route path="/admin" element={<Placeholder name="Admin dashboard" />} />
-            <Route path="/admin/tickets" element={<Placeholder name="All tickets" />} />
+            <Route path="/admin/tickets" element={<AdminTickets />} />
+            <Route path="/admin/tickets/:id" element={<AdminTicketDetail />} />
           </Route>
           <Route path="*" element={<Placeholder name="Not found" />} />
         </Route>

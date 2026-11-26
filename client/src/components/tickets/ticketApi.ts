@@ -1,12 +1,14 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "../../lib/api";
-import type { ActivityView, CommentView, ListMeta, TicketCategory, TicketPriority, TicketView } from "../../lib/types";
+import type { ActivityView, CommentView, ListMeta, TicketCategory, TicketPriority, TicketStatus, TicketView } from "../../lib/types";
 
 export interface ListParams {
   status?: string;
   priority?: string;
   category?: string;
   search?: string;
+  sort?: string;
+  order?: string;
   page: number;
 }
 
@@ -33,6 +35,14 @@ export const createTicket = (body: NewTicket) =>
 
 export const updateTicket = (id: string, body: Partial<Pick<NewTicket, "title" | "description" | "category">>) =>
   apiFetch<TicketView>(`/api/tickets/${id}`, { method: "PATCH", body }).then((r) => r.data);
+
+export interface AdminPatch {
+  status?: TicketStatus;
+  priority?: TicketPriority;
+}
+
+export const adminUpdateTicket = (id: string, body: AdminPatch) =>
+  apiFetch<TicketView>(`/api/admin/tickets/${id}`, { method: "PATCH", body }).then((r) => r.data);
 
 export const postComment = (id: string, body: string) =>
   apiFetch<CommentView>(`/api/tickets/${id}/comments`, { method: "POST", body: { body } }).then((r) => r.data);
