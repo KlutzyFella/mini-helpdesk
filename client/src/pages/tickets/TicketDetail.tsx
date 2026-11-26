@@ -39,7 +39,6 @@ export function TicketDetail({ adminControls, backTo = "/tickets", backLabel = "
   const remove = useMutation({
     mutationFn: () => deleteTicket(id),
     onSuccess: () => {
-      for (const key of ["ticket", "comments", "activity"]) queryClient.removeQueries({ queryKey: [key, id] });
       void queryClient.invalidateQueries({ queryKey: ["tickets"] });
       navigate(backTo);
     },
