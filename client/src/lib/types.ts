@@ -55,3 +55,26 @@ export interface ApiErrorBody {
 export type Envelope<T, M = unknown> =
   | { success: true; data: T; error: null; meta: M | null }
   | { success: false; data: null; error: ApiErrorBody; meta?: null };
+
+export interface CommentView {
+  id: string;
+  body: string;
+  createdAt: string;
+  author: { id: string; name: string; role: Role };
+}
+
+export type ActivityType =
+  | "TICKET_CREATED"
+  | "TICKET_UPDATED"
+  | "STATUS_CHANGED"
+  | "TICKET_RESOLVED"
+  | "COMMENT_ADDED";
+
+export interface ActivityView {
+  id: number;
+  type: ActivityType;
+  // Shape depends on `type`; lib/format.ts reads it defensively.
+  metadata: unknown;
+  createdAt: string;
+  actor: { id: string; name: string; role: Role };
+}
