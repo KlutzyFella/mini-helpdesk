@@ -4,6 +4,8 @@ import { ApiError } from "../../lib/api";
 import { fieldErrors, messageFor } from "../../lib/errors";
 import type { TicketView } from "../../lib/types";
 import { FormField } from "../FormField";
+import { ErrorAlert } from "../ui/feedback";
+import { button, PANEL } from "../ui/styles";
 import { SelectField, TextAreaField } from "./fields";
 import { CATEGORY_OPTIONS } from "./options";
 import { updateTicket, useInvalidateTicket } from "./ticketApi";
@@ -42,13 +44,23 @@ export function TicketEditForm({ ticket, onDone }: Props) {
 
   const errors = fieldErrors(save.error);
   return (
-    <form onSubmit={onSubmit} aria-label="Edit ticket" className="space-y-4 rounded border border-neutral-200 bg-white p-4">
-      {error && (
-        <p role="alert" className="rounded bg-red-50 px-3 py-2 text-sm text-red-800">
-          {error}
-        </p>
-      )}
-      <FormField label="Title" name="title" defaultValue={ticket.title} required minLength={3} maxLength={120} error={errors.title} />
+    <form
+      onSubmit={onSubmit}
+      onKeyDown={(e) => e.key === "Escape" && !save.isPending && onDone()}
+      aria-label="Edit ticket"
+      className={`${PANEL} space-y-5 p-5`}
+    >
+      {error && <ErrorAlert>{error}</ErrorAlert>}
+      <FormField
+        label="Title"
+        name="title"
+        defaultValue={ticket.title}
+        required
+        minLength={3}
+        maxLength={120}
+        autoFocus
+        error={errors.title}
+      />
       <TextAreaField
         label="Description"
         name="description"
@@ -59,16 +71,19 @@ export function TicketEditForm({ ticket, onDone }: Props) {
         maxLength={5000}
         error={errors.description}
       />
-      <SelectField label="Category" name="category" defaultValue={ticket.category} options={CATEGORY_OPTIONS} error={errors.category} />
-      <div className="flex gap-2">
-        <button
-          type="submit"
-          disabled={save.isPending || !ticket.permissions.edit}
-          className="rounded bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent-hover disabled:opacity-60"
-        >
-          {save.isPending ? "Saving..." : "Save changes"}
+      <SelectField
+        label="Category"
+        name="category"
+        defaultValue={ticket.category}
+        options={CATEGORY_OPTIONS}
+        error={errors.category}
+        className="sm:max-w-xs"
+      />
+      <div className="flex flex-wrap gap-2 border-t border-line pt-4">
+        <button type="submit" disabled={save.isPending || !ticket.permissions.edit} className={button("primary", "sm")}>
+          {save.isPending ? "Saving…" : "Save changes"}
         </button>
-        <button type="button" onClick={onDone} className="rounded border border-neutral-300 bg-white px-3 py-2 text-sm hover:bg-neutral-100">
+        <button type="button" onClick={onDone} className={button("ghost", "sm")}>
           Cancel
         </button>
       </div>

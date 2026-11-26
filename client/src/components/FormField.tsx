@@ -1,26 +1,28 @@
 import type { InputHTMLAttributes } from "react";
+import { FIELD_ERROR, INPUT, LABEL } from "./ui/styles";
 
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: string;
+  hint?: string;
 }
 
-export function FormField({ label, error, id, ...input }: Props) {
+export function FormField({ label, error, hint, id, className = "", ...input }: Props) {
   const fieldId = id ?? input.name;
+  const describedBy = [error && `${fieldId}-error`, hint && `${fieldId}-hint`].filter(Boolean).join(" ") || undefined;
   return (
-    <div>
-      <label htmlFor={fieldId} className="mb-1 block text-sm font-medium">
+    <div className={className}>
+      <label htmlFor={fieldId} className={LABEL}>
         {label}
       </label>
-      <input
-        id={fieldId}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={error ? `${fieldId}-error` : undefined}
-        className="w-full rounded border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-        {...input}
-      />
+      <input id={fieldId} aria-invalid={error ? true : undefined} aria-describedby={describedBy} className={INPUT} {...input} />
+      {hint && !error && (
+        <p id={`${fieldId}-hint`} className="mt-1.5 text-[13px] text-ink-3">
+          {hint}
+        </p>
+      )}
       {error && (
-        <p id={`${fieldId}-error`} className="mt-1 text-sm text-red-700">
+        <p id={`${fieldId}-error`} className={FIELD_ERROR}>
           {error}
         </p>
       )}

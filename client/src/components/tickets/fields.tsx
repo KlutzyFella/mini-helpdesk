@@ -1,7 +1,5 @@
-import type { SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
-
-const CONTROL =
-  "w-full rounded border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent";
+import { forwardRef, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
+import { FIELD_ERROR, LABEL, SELECT, TEXTAREA } from "../ui/styles";
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
@@ -10,18 +8,18 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   placeholder?: string;
 }
 
-export function SelectField({ label, error, id, options, placeholder, ...select }: SelectProps) {
+export function SelectField({ label, error, id, options, placeholder, className = "", ...select }: SelectProps) {
   const fieldId = id ?? select.name;
   return (
-    <div>
-      <label htmlFor={fieldId} className="mb-1 block text-sm font-medium">
+    <div className={className}>
+      <label htmlFor={fieldId} className={LABEL}>
         {label}
       </label>
       <select
         id={fieldId}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${fieldId}-error` : undefined}
-        className={CONTROL}
+        className={SELECT}
         {...select}
       >
         {placeholder !== undefined && <option value="">{placeholder}</option>}
@@ -32,7 +30,7 @@ export function SelectField({ label, error, id, options, placeholder, ...select 
         ))}
       </select>
       {error && (
-        <p id={`${fieldId}-error`} className="mt-1 text-sm text-red-700">
+        <p id={`${fieldId}-error`} className={FIELD_ERROR}>
           {error}
         </p>
       )}
@@ -43,27 +41,32 @@ export function SelectField({ label, error, id, options, placeholder, ...select 
 interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
   error?: string;
+  hideLabel?: boolean;
 }
 
-export function TextAreaField({ label, error, id, ...area }: TextAreaProps) {
+export const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaProps>(function TextAreaField(
+  { label, error, hideLabel = false, id, ...area },
+  ref,
+) {
   const fieldId = id ?? area.name;
   return (
     <div>
-      <label htmlFor={fieldId} className="mb-1 block text-sm font-medium">
+      <label htmlFor={fieldId} className={hideLabel ? "sr-only" : LABEL}>
         {label}
       </label>
       <textarea
+        ref={ref}
         id={fieldId}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${fieldId}-error` : undefined}
-        className={CONTROL}
+        className={TEXTAREA}
         {...area}
       />
       {error && (
-        <p id={`${fieldId}-error`} className="mt-1 text-sm text-red-700">
+        <p id={`${fieldId}-error`} className={FIELD_ERROR}>
           {error}
         </p>
       )}
     </div>
   );
-}
+});

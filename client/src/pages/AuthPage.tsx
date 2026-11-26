@@ -2,20 +2,26 @@ import { useState, type FormEvent, type ReactNode } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 import { homeFor } from "../auth/guards";
+import { ErrorAlert, useDocumentTitle } from "../components/ui/feedback";
+import { BrandMark } from "../components/ui/Icon";
+import { button } from "../components/ui/styles";
 import { WakeBanner } from "../components/WakeBanner";
 import { fieldErrors, messageFor } from "../lib/errors";
 import type { PublicUser } from "../lib/types";
 
 interface Props {
   title: string;
+  subtitle: string;
   submitLabel: string;
+  busyLabel: string;
   footer: ReactNode;
   submit: (form: FormData) => Promise<PublicUser>;
   children: (errors: Record<string, string>) => ReactNode;
 }
 
-export function AuthPage({ title, submitLabel, footer, submit, children }: Props) {
+export function AuthPage({ title, subtitle, submitLabel, busyLabel, footer, submit, children }: Props) {
   const { user } = useAuth();
+  useDocumentTitle(title);
   const navigate = useNavigate();
   const location = useLocation();
   const [busy, setBusy] = useState(false);
@@ -43,34 +49,33 @@ export function AuthPage({ title, submitLabel, footer, submit, children }: Props
   }
 
   return (
-    <div>
+    <div className="flex min-h-dvh flex-col">
       <WakeBanner />
-      <div className="mx-auto mt-16 w-full max-w-sm px-4">
-        <h1 className="mb-6 text-2xl font-semibold">{title}</h1>
-        <form onSubmit={onSubmit} className="space-y-4 rounded border border-neutral-200 bg-white p-6">
-          {formError && (
-            <p role="alert" className="rounded bg-red-50 px-3 py-2 text-sm text-red-800">
-              {formError}
-            </p>
-          )}
-          {children(errors)}
-          <button
-            type="submit"
-            disabled={busy}
-            className="w-full rounded bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent-hover disabled:opacity-60"
-          >
-            {busy ? "Please wait..." : submitLabel}
-          </button>
-        </form>
-        <p className="mt-4 text-center text-sm text-neutral-600">{footer}</p>
-      </div>
+      <main className="flex flex-1 flex-col items-center px-4 pt-[12vh] pb-16">
+        <div className="w-full max-w-[22rem]">
+          <Link to="/" className="mb-8 inline-flex items-center gap-2.5 rounded-md">
+            <BrandMark className="size-8" />
+            <span className="text-[15px] font-semibold tracking-[-0.01em] text-ink">Mini Helpdesk</span>
+          </Link>
+          <h1 className="text-2xl font-semibold tracking-[-0.02em] text-ink">{title}</h1>
+          <p className="mt-1.5 text-sm text-ink-2">{subtitle}</p>
+          <form onSubmit={onSubmit} className="mt-8 space-y-5">
+            {formError && <ErrorAlert>{formError}</ErrorAlert>}
+            {children(errors)}
+            <button type="submit" disabled={busy} className={`${button("primary")} w-full`}>
+              {busy ? busyLabel : submitLabel}
+            </button>
+          </form>
+          <p className="mt-8 border-t border-line pt-6 text-sm text-ink-2">{footer}</p>
+        </div>
+      </main>
     </div>
   );
 }
 
 export function authLink(to: string, text: string) {
   return (
-    <Link to={to} className="text-accent hover:underline">
+    <Link to={to} className="font-medium text-accent-ink hover:underline">
       {text}
     </Link>
   );

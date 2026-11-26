@@ -1,26 +1,26 @@
 import type { ListMeta } from "../../lib/types";
+import { button } from "../ui/styles";
 
 interface Props {
-  meta: Pick<ListMeta, "page" | "totalPages" | "total">;
+  meta: Pick<ListMeta, "page" | "totalPages" | "total" | "limit">;
   onPage: (page: number) => void;
 }
 
-const BTN =
-  "rounded border border-neutral-300 bg-white px-3 py-1.5 text-sm hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50";
-
 export function Pagination({ meta, onPage }: Props) {
-  const { page, totalPages, total } = meta;
+  const { page, totalPages, total, limit } = meta;
   if (totalPages <= 1) return null;
+  const first = (page - 1) * limit + 1;
+  const last = Math.min(page * limit, total);
   return (
-    <nav aria-label="Pagination" className="mt-4 flex items-center justify-between gap-3">
-      <p className="text-sm text-neutral-600">
-        Page {page} of {totalPages} ({total} tickets)
+    <nav aria-label="Pagination" className="mt-5 flex flex-wrap items-center justify-between gap-3">
+      <p className="text-sm text-ink-2 tabular">
+        Showing <span className="font-medium text-ink">{first}–{last}</span> of {total} · Page {page} of {totalPages}
       </p>
       <div className="flex gap-2">
-        <button type="button" className={BTN} disabled={page <= 1} onClick={() => onPage(page - 1)}>
+        <button type="button" className={button("secondary", "sm")} disabled={page <= 1} onClick={() => onPage(page - 1)}>
           Previous
         </button>
-        <button type="button" className={BTN} disabled={page >= totalPages} onClick={() => onPage(page + 1)}>
+        <button type="button" className={button("secondary", "sm")} disabled={page >= totalPages} onClick={() => onPage(page + 1)}>
           Next
         </button>
       </div>
