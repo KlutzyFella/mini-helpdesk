@@ -18,9 +18,6 @@ export function Layout() {
               <NavLink to="/admin/tickets" className={link}>
                 All tickets
               </NavLink>
-              <NavLink to="/admin" end className={link}>
-                Dashboard
-              </NavLink>
             </>
           ) : (
             <>

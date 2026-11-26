@@ -16,7 +16,6 @@ function RootRedirect() {
   return <Navigate to={user ? homeFor(user.role) : "/login"} replace />;
 }
 
-// PR8 and PR9 swap the Placeholder element on one line per route.
 export function App() {
   return (
     <Routes>
@@ -31,7 +30,7 @@ export function App() {
             <Route path="/tickets/:id" element={<TicketDetail />} />
           </Route>
           <Route element={<RequireRole role="ADMIN" />}>
-            <Route path="/admin" element={<Placeholder name="Admin dashboard" />} />
+            <Route path="/admin" element={<Navigate to="/admin/tickets" replace />} />
             <Route path="/admin/tickets" element={<AdminTickets />} />
             <Route path="/admin/tickets/:id" element={<AdminTicketDetail />} />
           </Route>
