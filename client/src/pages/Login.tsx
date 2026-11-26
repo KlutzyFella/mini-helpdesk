@@ -7,7 +7,9 @@ export function Login() {
   return (
     <AuthPage
       title="Sign in"
+      subtitle="Welcome back. Sign in to check on your tickets."
       submitLabel="Sign in"
+      busyLabel="Signing in…"
       footer={<>No account? {authLink("/register", "Register")}</>}
       submit={(f) => login(String(f.get("email")), String(f.get("password")))}
     >

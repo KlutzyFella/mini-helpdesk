@@ -1,6 +1,8 @@
 import type { TicketCategory, TicketPriority, TicketStatus } from "../../lib/types";
-import { CATEGORY_OPTIONS, PRIORITY_OPTIONS, STATUS_OPTIONS } from "./options";
+import { Icon } from "../ui/Icon";
+import { INPUT, LABEL } from "../ui/styles";
 import { SelectField } from "./fields";
+import { CATEGORY_OPTIONS, PRIORITY_OPTIONS, STATUS_OPTIONS } from "./options";
 
 export interface TicketFilterValues {
   status: TicketStatus | "";
@@ -14,9 +16,34 @@ interface Props {
   onChange: (patch: Partial<TicketFilterValues>) => void;
 }
 
+export const NO_FILTERS: TicketFilterValues = { status: "", priority: "", category: "", search: "" };
+
 export function TicketFilters({ value, onChange }: Props) {
   return (
-    <form role="search" aria-label="Filter tickets" onSubmit={(e) => e.preventDefault()} className="grid gap-3 sm:grid-cols-4">
+    <form
+      role="search"
+      aria-label="Filter tickets"
+      onSubmit={(e) => e.preventDefault()}
+      className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))]"
+    >
+      <div className="col-span-2 sm:col-span-3 lg:col-span-1">
+        <label htmlFor="search" className={LABEL}>
+          Search
+        </label>
+        <div className="relative">
+          <Icon name="search" className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-3" />
+          <input
+            id="search"
+            name="search"
+            type="search"
+            maxLength={100}
+            placeholder="Title or description"
+            value={value.search}
+            onChange={(e) => onChange({ search: e.target.value })}
+            className={`${INPUT} pl-9`}
+          />
+        </div>
+      </div>
       <SelectField
         label="Status"
         name="status"
@@ -39,23 +66,9 @@ export function TicketFilters({ value, onChange }: Props) {
         value={value.category}
         options={CATEGORY_OPTIONS}
         placeholder="All categories"
+        className="col-span-2 sm:col-span-1"
         onChange={(e) => onChange({ category: e.target.value as TicketFilterValues["category"] })}
       />
-      <div>
-        <label htmlFor="search" className="mb-1 block text-sm font-medium">
-          Search
-        </label>
-        <input
-          id="search"
-          name="search"
-          type="search"
-          maxLength={100}
-          placeholder="Title or description"
-          value={value.search}
-          onChange={(e) => onChange({ search: e.target.value })}
-          className="w-full rounded border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-        />
-      </div>
     </form>
   );
 }

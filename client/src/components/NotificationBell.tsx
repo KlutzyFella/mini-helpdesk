@@ -5,6 +5,7 @@ import { apiFetch } from "../lib/api";
 import { messageFor } from "../lib/errors";
 import { formatDateTime } from "../lib/format";
 import type { NotificationView, Role } from "../lib/types";
+import { Icon } from "./ui/Icon";
 
 const POLL_MS = 30_000;
 const QUERY_KEY = ["notifications"];
@@ -64,13 +65,13 @@ export function NotificationBell({ role }: NotificationBellProps) {
         onClick={toggle}
         aria-expanded={open}
         aria-label={notifications.isSuccess ? `Notifications, ${unreadCount} unread` : "Notifications"}
-        className="relative rounded p-1.5 text-neutral-600 hover:text-neutral-900"
+        className={`relative grid size-10 place-items-center rounded-lg transition-colors duration-150 hover:bg-surface-2 hover:text-ink ${
+          open ? "bg-surface-2 text-ink" : "text-ink-2"
+        }`}
       >
-        <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-        </svg>
+        <Icon name="bell" className="size-5" />
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-4 rounded-full bg-red-600 px-1 text-center text-[10px] leading-4 font-semibold text-white">
+          <span className="absolute top-1 right-1 min-w-[18px] rounded-full bg-danger px-1 text-center text-[11px] leading-[18px] font-semibold text-on-accent tabular ring-2 ring-surface">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
@@ -80,33 +81,52 @@ export function NotificationBell({ role }: NotificationBellProps) {
         <section
           role="region"
           aria-label="Notifications"
-          className="absolute right-0 z-10 mt-2 w-80 overflow-hidden rounded border border-neutral-200 bg-white shadow-lg"
+          className="animate-rise-in fixed inset-x-3 top-16 z-30 overflow-hidden rounded-xl border border-line bg-surface shadow-pop sm:absolute sm:inset-x-auto sm:top-auto sm:right-0 sm:mt-2 sm:w-[23rem]"
         >
-          <h2 className="border-b border-neutral-200 px-4 py-2 text-sm font-medium">Notifications</h2>
+          <header className="flex items-baseline justify-between border-b border-line px-4 py-3">
+            <h2 className="text-sm font-semibold text-ink">Notifications</h2>
+            {fresh.size > 0 && <span className="text-xs text-ink-3 tabular">{fresh.size} new</span>}
+          </header>
           {notifications.isError && (
-            <p role="alert" className="px-4 py-3 text-sm text-red-800">
+            <p role="alert" className="px-4 py-3 text-sm text-danger">
               {messageFor(notifications.error)}
             </p>
           )}
           {notifications.isSuccess && items.length === 0 && (
-            <p className="px-4 py-6 text-center text-sm text-neutral-500">No notifications yet.</p>
+            <div className="flex flex-col items-center px-6 py-10 text-center">
+              <Icon name="bell" className="size-5 text-ink-3" />
+              <p className="mt-3 text-sm text-ink-2">No notifications yet.</p>
+              <p className="mt-1 text-xs text-ink-3">Updates on your tickets will show up here.</p>
+            </div>
           )}
           {items.length > 0 && (
-            <ul className="max-h-96 divide-y divide-neutral-100 overflow-y-auto">
-              {items.map((n) => (
-                <li key={n.id}>
-                  <Link
-                    to={ticketPath(role, n.ticket.id)}
-                    onClick={() => setOpen(false)}
-                    className={`block px-4 py-3 text-sm hover:bg-neutral-50 ${fresh.has(n.id) || n.readAt === null ? "bg-blue-50" : ""}`}
-                  >
-                    <p className="text-neutral-900">{n.message}</p>
-                    <p className="mt-1 text-xs text-neutral-500">
-                      <time dateTime={n.createdAt}>{formatDateTime(n.createdAt)}</time>
-                    </p>
-                  </Link>
-                </li>
-              ))}
+            <ul className="max-h-[26rem] divide-y divide-line overflow-y-auto overscroll-contain">
+              {items.map((n) => {
+                const unread = fresh.has(n.id) || n.readAt === null;
+                return (
+                  <li key={n.id}>
+                    <Link
+                      to={ticketPath(role, n.ticket.id)}
+                      onClick={() => setOpen(false)}
+                      className={`flex gap-3 px-4 py-3 text-sm transition-colors duration-150 hover:bg-surface-2 focus-visible:-outline-offset-2 ${
+                        unread ? "bg-accent-soft/60" : ""
+                      }`}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={`mt-1.5 size-2 shrink-0 rounded-full ${unread ? "bg-accent" : "bg-transparent"}`}
+                      />
+                      <span className="min-w-0">
+                        {unread && <span className="sr-only">Unread: </span>}
+                        <span className={`block ${unread ? "font-medium text-ink" : "text-ink-2"}`}>{n.message}</span>
+                        <time dateTime={n.createdAt} className="mt-1 block text-xs text-ink-3">
+                          {formatDateTime(n.createdAt)}
+                        </time>
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </section>

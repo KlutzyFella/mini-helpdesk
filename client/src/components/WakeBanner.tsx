@@ -35,8 +35,11 @@ export function WakeBanner() {
 
   if (!waking) return null;
   return (
-    <div role="status" className="bg-amber-100 px-4 py-2 text-center text-sm text-amber-900">
-      The server is waking up. This can take up to a minute.
+    <div role="status" className="tone-amber tone-soft border-b border-line">
+      <p className="mx-auto flex max-w-6xl items-center justify-center gap-2.5 px-4 py-2 text-center text-sm">
+        <span aria-hidden="true" className="size-2 shrink-0 rounded-full tone-fill animate-pulse-dot" />
+        The server is waking up. This can take up to a minute.
+      </p>
     </div>
   );
 }

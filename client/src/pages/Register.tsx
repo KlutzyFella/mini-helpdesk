@@ -7,7 +7,9 @@ export function Register() {
   return (
     <AuthPage
       title="Create an account"
-      submitLabel="Register"
+      subtitle="Raise a ticket and follow it until it is resolved."
+      submitLabel="Create account"
+      busyLabel="Creating account…"
       footer={<>Already registered? {authLink("/login", "Sign in")}</>}
       submit={(f) => register(String(f.get("name")), String(f.get("email")), String(f.get("password")))}
     >
@@ -23,6 +25,7 @@ export function Register() {
             required
             minLength={8}
             maxLength={72}
+            hint="At least 8 characters."
             error={errors.password}
           />
         </>

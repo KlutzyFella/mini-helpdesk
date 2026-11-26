@@ -6,7 +6,7 @@ import { AdminTicketDetail } from "./pages/admin/AdminTicketDetail";
 import { Dashboard } from "./pages/admin/Dashboard";
 import { AdminTickets } from "./pages/admin/AdminTickets";
 import { Login } from "./pages/Login";
-import { Placeholder } from "./pages/Placeholder";
+import { NotFound } from "./pages/NotFound";
 import { Register } from "./pages/Register";
 import { MyTickets } from "./pages/tickets/MyTickets";
 import { NewTicket } from "./pages/tickets/NewTicket";
@@ -35,7 +35,7 @@ export function App() {
             <Route path="/admin/tickets" element={<AdminTickets />} />
             <Route path="/admin/tickets/:id" element={<AdminTicketDetail />} />
           </Route>
-          <Route path="*" element={<Placeholder name="Not found" />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Route>
     </Routes>
