@@ -1,9 +1,11 @@
 import { logger } from "../lib/logger.ts";
+import { recordActivity } from "./subscribers/recordActivity.ts";
+import { sendNotifications } from "./subscribers/sendNotifications.ts";
 import type { DomainEvent } from "./types.ts";
 
 export type Subscriber = (e: DomainEvent) => Promise<void>;
 
-export const subscribers: Subscriber[] = [];
+export const subscribers: Subscriber[] = [recordActivity, sendNotifications];
 
 export async function publish(events: DomainEvent[]): Promise<void> {
   for (const e of events)
