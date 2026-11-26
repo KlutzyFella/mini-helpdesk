@@ -4,7 +4,7 @@ import type { Role } from "../lib/types";
 import { useAuth } from "./AuthContext";
 
 export function homeFor(role: Role): string {
-  return role === "ADMIN" ? "/admin" : "/tickets";
+  return role === "ADMIN" ? "/admin/tickets" : "/tickets";
 }
 
 export function RequireAuth({ children }: { children?: ReactNode }) {

@@ -15,11 +15,11 @@ export function Layout() {
           <span className="mr-4 font-semibold">Mini Helpdesk</span>
           {user?.role === "ADMIN" ? (
             <>
-              <NavLink to="/admin" end className={link}>
-                Dashboard
-              </NavLink>
               <NavLink to="/admin/tickets" className={link}>
                 All tickets
+              </NavLink>
+              <NavLink to="/admin" end className={link}>
+                Dashboard
               </NavLink>
             </>
           ) : (
