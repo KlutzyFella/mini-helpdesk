@@ -101,6 +101,7 @@ Each request runs its checks in a fixed order, and the first failure decides the
 | GET | `/api/tickets/:id/activity` | the owner or an ADMIN |
 | GET | `/api/notifications` | any signed-in user |
 | PATCH | `/api/notifications/:id/read` | the recipient |
+| GET | `/api/admin/stats` | ADMIN |
 
 ### `GET /health`
 
@@ -382,6 +383,29 @@ Success: `200` with the notification.
 
 Errors: `UNAUTHENTICATED`, `NOT_FOUND`. Another user's notification returns 404.
 
+### `GET /api/admin/stats`
+
+Returns `200` with ticket counts and the mean time to resolve. Each count object has a key for every enum value, so an empty bucket reads `0`. `total` is the sum of `byStatus`. All five values come from one snapshot.
+
+`avgResolutionHours` is the mean of `resolvedAt - createdAt` in hours, rounded to 2 decimals, over every ticket with a `resolvedAt`. A ticket that was resolved and then closed keeps its `resolvedAt` and still counts. A ticket moved back to `IN_PROGRESS` loses it and drops out. The value is `null` when no ticket has resolved.
+
+```json
+{
+	"success": true,
+	"data": {
+		"total": 12,
+		"byStatus": { "OPEN": 4, "IN_PROGRESS": 3, "RESOLVED": 2, "CLOSED": 3 },
+		"byPriority": { "LOW": 2, "MEDIUM": 5, "HIGH": 4, "URGENT": 1 },
+		"byCategory": { "BUG": 5, "BILLING": 2, "ACCOUNT": 2, "FEATURE_REQUEST": 2, "OTHER": 1 },
+		"avgResolutionHours": 26.4
+	},
+	"error": null,
+	"meta": null
+}
+```
+
+Errors: `UNAUTHENTICATED`, `FORBIDDEN`.
+
 ## The `permissions` object
 
 Every ticket in a list or detail response carries `permissions`. The server computes it from the caller's role and the ticket's status, with the same functions that guard the writes. The client shows a button only when its flag allows it, and copies no rule.
@@ -419,7 +443,7 @@ The same events create notifications. The person who acted is never notified.
 
 ## Run the Postman collection
 
-`docs/helpdesk.postman_collection.json` has 27 requests in 6 folders, with test assertions on each request. It registers a new user with a random email, creates a ticket, and walks the ticket through comments, triage, activity, and notifications. Each step saves the ids and tokens that later steps need.
+`docs/helpdesk.postman_collection.json` has 30 requests in 7 folders, with test assertions on each request. It registers a new user with a random email, creates a ticket, and walks the ticket through comments, triage, activity, and notifications, then checks the admin stats against the ticket list. Each step saves the ids and tokens that later steps need.
 
 To run it in Postman:
 

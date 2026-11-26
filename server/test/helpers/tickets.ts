@@ -8,6 +8,7 @@ export interface TicketOverrides {
   priority?: TicketPriority;
   status?: TicketStatus;
   resolvedAt?: Date | null;
+  createdAt?: Date;
 }
 
 export function createTicket(createdById: string, overrides: TicketOverrides = {}) {
