@@ -3,6 +3,7 @@ import { useAuth } from "./auth/AuthContext";
 import { RequireAuth, RequireRole, homeFor } from "./auth/guards";
 import { Layout } from "./components/Layout";
 import { AdminTicketDetail } from "./pages/admin/AdminTicketDetail";
+import { Dashboard } from "./pages/admin/Dashboard";
 import { AdminTickets } from "./pages/admin/AdminTickets";
 import { Login } from "./pages/Login";
 import { Placeholder } from "./pages/Placeholder";
@@ -30,7 +31,7 @@ export function App() {
             <Route path="/tickets/:id" element={<TicketDetail />} />
           </Route>
           <Route element={<RequireRole role="ADMIN" />}>
-            <Route path="/admin" element={<Navigate to="/admin/tickets" replace />} />
+            <Route path="/admin" element={<Dashboard />} />
             <Route path="/admin/tickets" element={<AdminTickets />} />
             <Route path="/admin/tickets/:id" element={<AdminTicketDetail />} />
           </Route>

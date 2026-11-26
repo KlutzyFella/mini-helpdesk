@@ -65,3 +65,13 @@ export function activityLabel(a: Pick<ActivityView, "type" | "metadata" | "actor
       return `${name} made a change`;
   }
 }
+
+const oneDecimal = (n: number) => String(Math.round(n * 10) / 10);
+
+export function formatHours(hours: number): string {
+  const minutes = Math.round(hours * 60);
+  if (minutes < 1) return "Under 1 min";
+  if (minutes < 60) return `${minutes} min`;
+  if (hours < 48) return `${oneDecimal(hours)} h`;
+  return `${oneDecimal(hours / 24)} days`;
+}

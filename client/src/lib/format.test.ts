@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { STATUSES } from "./enums";
-import { activityLabel, statusLabel } from "./format";
+import { activityLabel, formatHours, statusLabel } from "./format";
 import type { ActivityView } from "./types";
 
 const actor = (name: string, role: "USER" | "ADMIN" = "USER") => ({ id: "u", name, role });
@@ -63,5 +63,15 @@ describe("activityLabel", () => {
 
   it("COMMENT_ADDED", () => {
     expect(activityLabel(row("COMMENT_ADDED", { commentId: "c" }, actor("Admin", "ADMIN")))).toBe("Admin commented");
+  });
+});
+
+describe("formatHours", () => {
+  it("picks minutes, hours, or days by size", () => {
+    expect(formatHours(0)).toBe("Under 1 min");
+    expect(formatHours(0.5)).toBe("30 min");
+    expect(formatHours(26.44)).toBe("26.4 h");
+    expect(formatHours(72)).toBe("3 days");
+    expect(formatHours(60)).toBe("2.5 days");
   });
 });
