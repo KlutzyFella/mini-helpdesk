@@ -27,6 +27,10 @@
     {
       "key": "userEmail",
       "value": ""
+    },
+    {
+      "key": "ticketId",
+      "value": ""
     }
   ],
   "item": [
@@ -234,6 +238,319 @@
                   "pm.test('status is 200', function () { pm.response.to.have.status(200); });",
                   "pm.test('success is true', function () { pm.expect(pm.response.json().success).to.eql(true); });",
                   "pm.test('role is ADMIN', function () { pm.expect(pm.response.json().data.role).to.eql('ADMIN'); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tickets",
+      "item": [
+        {
+          "name": "POST /api/tickets",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/tickets",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Postman ticket\",\n  \"description\": \"Created by the Postman Tickets folder.\",\n  \"category\": \"BUG\",\n  \"priority\": \"HIGH\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', function () { pm.response.to.have.status(201); });",
+                  "pm.test('success is true', function () { pm.expect(pm.response.json().success).to.eql(true); });",
+                  "pm.test('ticket saved', function () { var j = pm.response.json(); pm.expect(j.data.id).to.be.a('string'); pm.expect(j.data.status).to.eql('OPEN'); pm.expect(j.data.permissions.edit).to.eql(true); pm.collectionVariables.set('ticketId', j.data.id); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/tickets (user)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/tickets"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('success is true', function () { pm.expect(pm.response.json().success).to.eql(true); });",
+                  "pm.test('meta and own ticket', function () { var j = pm.response.json(); pm.expect(j.meta.page).to.eql(1); pm.expect(j.meta.limit).to.eql(20); pm.expect(j.meta.total).to.be.at.least(1); pm.expect(j.meta.totalPages).to.be.at.least(1); pm.expect(j.data.map(function (x) { return x.id; })).to.include(pm.collectionVariables.get('ticketId')); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/tickets/:id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/tickets/{{ticketId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('success is true', function () { pm.expect(pm.response.json().success).to.eql(true); });",
+                  "pm.test('is the created ticket', function () { var j = pm.response.json(); pm.expect(j.data.id).to.eql(pm.collectionVariables.get('ticketId')); pm.expect(j.data.createdBy.name).to.be.a('string'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /api/tickets/:id (title)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/tickets/{{ticketId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Postman ticket renamed\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('success is true', function () { pm.expect(pm.response.json().success).to.eql(true); });",
+                  "pm.test('title changed', function () { var j = pm.response.json(); pm.expect(j.data.title).to.eql('Postman ticket renamed'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /api/admin/tickets/:id (as user)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/tickets/{{ticketId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"priority\": \"LOW\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 403', function () { pm.response.to.have.status(403); });",
+                  "pm.test('success is false', function () { pm.expect(pm.response.json().success).to.eql(false); });",
+                  "pm.test('error.code is FORBIDDEN', function () { pm.expect(pm.response.json().error.code).to.eql('FORBIDDEN'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/tickets?status=OPEN&priority=HIGH (admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/tickets?status=OPEN&priority=HIGH"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('success is true', function () { pm.expect(pm.response.json().success).to.eql(true); });",
+                  "pm.test('filter applied and ticket found', function () { var j = pm.response.json(); pm.expect(j.data.every(function (x) { return x.status === 'OPEN' && x.priority === 'HIGH'; })).to.eql(true); pm.expect(j.data.map(function (x) { return x.id; })).to.include(pm.collectionVariables.get('ticketId')); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /api/admin/tickets/:id (IN_PROGRESS)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/tickets/{{ticketId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"IN_PROGRESS\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('success is true', function () { pm.expect(pm.response.json().success).to.eql(true); });",
+                  "pm.test('moved', function () { var j = pm.response.json(); pm.expect(j.data.status).to.eql('IN_PROGRESS'); pm.expect(j.data.permissions.nextStatuses).to.eql(['RESOLVED', 'OPEN']); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /api/tickets/:id (locked)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/tickets/{{ticketId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Too late to edit\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 409', function () { pm.response.to.have.status(409); });",
+                  "pm.test('success is false', function () { pm.expect(pm.response.json().success).to.eql(false); });",
+                  "pm.test('error.code is TICKET_LOCKED', function () { pm.expect(pm.response.json().error.code).to.eql('TICKET_LOCKED'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /api/admin/tickets/:id (RESOLVED)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/tickets/{{ticketId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"RESOLVED\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('success is true', function () { pm.expect(pm.response.json().success).to.eql(true); });",
+                  "pm.test('resolved with resolvedAt', function () { var j = pm.response.json(); pm.expect(j.data.status).to.eql('RESOLVED'); pm.expect(j.data.resolvedAt).to.be.a('string'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/tickets/not-a-uuid",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/tickets/not-a-uuid"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 404', function () { pm.response.to.have.status(404); });",
+                  "pm.test('success is false', function () { pm.expect(pm.response.json().success).to.eql(false); });",
+                  "pm.test('error.code is NOT_FOUND', function () { pm.expect(pm.response.json().error.code).to.eql('NOT_FOUND'); });"
                 ]
               }
             }

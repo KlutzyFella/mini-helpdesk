@@ -1,0 +1,55 @@
+EXPLAIN ANALYZE for the admin ticket list (PR2, D17)
+
+Data: 5,000 tickets across 50 users, statuses and priorities random and uniform, ANALYZE run. 333 rows match status=OPEN and priority=HIGH.
+Query: the SQL behind GET /api/tickets?status=OPEN&priority=HIGH as an admin, first page.
+  SELECT * FROM tickets WHERE status = 'OPEN' AND priority = 'HIGH'
+  ORDER BY "createdAt" DESC, id DESC LIMIT 20;
+Database: PostgreSQL 17 in the compose container. Plans use EXPLAIN (ANALYZE, BUFFERS). The second plan ran inside BEGIN; DROP INDEX; ...; ROLLBACK.
+
+Summary
+With the (status, priority, createdAt) index present, the planner still chose a backward scan of the plain createdAt index plus an incremental sort on id, and filtered out 315 rows to find 20 matches.
+Without the composite index the plan is identical and takes 0.09 ms against 0.20 ms, so at 5,000 rows the composite index does not change the plan. The extra time in the first run is most likely cold-cache and planning overhead (inferred from Planning Buffers 171 against 5).
+
+=== WITH INDEX ===
+                                                                         QUERY PLAN                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1.28..21.85 rows=20 width=116) (actual time=0.128..0.131 rows=20 loops=1)
+   Buffers: shared hit=22
+   ->  Incremental Sort  (cost=1.28..316.05 rows=306 width=116) (actual time=0.127..0.129 rows=20 loops=1)
+         Sort Key: "createdAt" DESC, id DESC
+         Presorted Key: "createdAt"
+         Full-sort Groups: 1  Sort Method: quicksort  Average Memory: 30kB  Peak Memory: 30kB
+         Buffers: shared hit=22
+         ->  Index Scan Backward using "tickets_createdAt_idx" on tickets  (cost=0.28..302.28 rows=306 width=116) (actual time=0.022..0.061 rows=21 loops=1)
+               Filter: ((status = 'OPEN'::"TicketStatus") AND (priority = 'HIGH'::"TicketPriority"))
+               Rows Removed by Filter: 315
+               Buffers: shared hit=13
+ Planning:
+   Buffers: shared hit=171
+ Planning Time: 1.053 ms
+ Execution Time: 0.199 ms
+(15 rows)
+
+=== WITHOUT tickets_status_priority_createdAt_idx ===
+BEGIN
+DROP INDEX
+                                                                         QUERY PLAN                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1.28..21.85 rows=20 width=116) (actual time=0.059..0.061 rows=20 loops=1)
+   Buffers: shared hit=13
+   ->  Incremental Sort  (cost=1.28..316.05 rows=306 width=116) (actual time=0.058..0.059 rows=20 loops=1)
+         Sort Key: "createdAt" DESC, id DESC
+         Presorted Key: "createdAt"
+         Full-sort Groups: 1  Sort Method: quicksort  Average Memory: 30kB  Peak Memory: 30kB
+         Buffers: shared hit=13
+         ->  Index Scan Backward using "tickets_createdAt_idx" on tickets  (cost=0.28..302.28 rows=306 width=116) (actual time=0.018..0.047 rows=21 loops=1)
+               Filter: ((status = 'OPEN'::"TicketStatus") AND (priority = 'HIGH'::"TicketPriority"))
+               Rows Removed by Filter: 315
+               Buffers: shared hit=13
+ Planning:
+   Buffers: shared hit=5
+ Planning Time: 0.096 ms
+ Execution Time: 0.086 ms
+(15 rows)
+
+ROLLBACK
