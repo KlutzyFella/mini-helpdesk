@@ -5,6 +5,9 @@ import { Layout } from "./components/Layout";
 import { Login } from "./pages/Login";
 import { Placeholder } from "./pages/Placeholder";
 import { Register } from "./pages/Register";
+import { MyTickets } from "./pages/tickets/MyTickets";
+import { NewTicket } from "./pages/tickets/NewTicket";
+import { TicketDetail } from "./pages/tickets/TicketDetail";
 
 function RootRedirect() {
   const { user } = useAuth();
@@ -21,9 +24,9 @@ export function App() {
         <Route element={<Layout />}>
           <Route path="/" element={<RootRedirect />} />
           <Route element={<RequireRole role="USER" />}>
-            <Route path="/tickets" element={<Placeholder name="My tickets" />} />
-            <Route path="/tickets/new" element={<Placeholder name="New ticket" />} />
-            <Route path="/tickets/:id" element={<Placeholder name="Ticket detail" />} />
+            <Route path="/tickets" element={<MyTickets />} />
+            <Route path="/tickets/new" element={<NewTicket />} />
+            <Route path="/tickets/:id" element={<TicketDetail />} />
           </Route>
           <Route element={<RequireRole role="ADMIN" />}>
             <Route path="/admin" element={<Placeholder name="Admin dashboard" />} />
