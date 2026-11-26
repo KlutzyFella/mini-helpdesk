@@ -5,6 +5,7 @@ import * as controller from "./notifications.controller.ts";
 export function createNotificationsRouter(): Router {
   const router = Router();
   router.get("/notifications", authenticate, controller.list);
+  router.patch("/notifications/read-all", authenticate, controller.readAll);
   router.patch("/notifications/:id/read", authenticate, controller.markRead);
   return router;
 }

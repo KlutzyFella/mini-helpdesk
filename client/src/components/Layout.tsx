@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from "react-router";
 import { useAuth } from "../auth/AuthContext";
+import { NotificationBell } from "./NotificationBell";
 import { WakeBanner } from "./WakeBanner";
 
 const link = ({ isActive }: { isActive: boolean }) =>
@@ -32,10 +33,13 @@ export function Layout() {
               </NavLink>
             </>
           )}
-          <span className="ml-auto text-sm text-neutral-500">{user?.name}</span>
-          <button type="button" onClick={logout} className="rounded px-3 py-1.5 text-sm text-neutral-600 hover:text-neutral-900">
-            Log out
-          </button>
+          <div className="ml-auto flex items-center gap-2">
+            {user && <NotificationBell role={user.role} />}
+            <span className="text-sm text-neutral-500">{user?.name}</span>
+            <button type="button" onClick={logout} className="rounded px-3 py-1.5 text-sm text-neutral-600 hover:text-neutral-900">
+              Log out
+            </button>
+          </div>
         </nav>
       </header>
       <main className="mx-auto max-w-5xl px-4 py-8">

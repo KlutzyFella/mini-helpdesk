@@ -27,10 +27,10 @@ The API runs on Render's free tier in Singapore, and the database is Neon Postgr
 | 3B Tickets | A USER creates tickets with a title, description, category, and priority, lists and reads their own tickets, and follows the status. The owner edits or deletes a ticket while it is `OPEN`. |
 | 3C Admin | An ADMIN lists every ticket, filters by status, priority, and category, reads any ticket with its comments, and changes status and priority along a fixed transition table. |
 | 3D Comments | The owner and any admin comment on a ticket. Each comment stores its ticket and its author. A `CLOSED` ticket takes no new comments. |
-| 4 Events | Five event types: `TICKET_CREATED`, `TICKET_UPDATED`, `STATUS_CHANGED`, `TICKET_RESOLVED`, and `COMMENT_ADDED`. Two subscribers write the activity log and the notifications. Each ticket page shows its activity timeline. |
-| 6 Bonus | Search, pagination, sorting, and filtering on the ticket list. An admin stats dashboard with counts by status, priority, and category, and the mean time to resolve. 176 automated tests and a Postman collection. A React frontend. CI on GitHub Actions. |
+| 4 Events | Five event types: `TICKET_CREATED`, `TICKET_UPDATED`, `STATUS_CHANGED`, `TICKET_RESOLVED`, and `COMMENT_ADDED`. Two subscribers write the activity log and the notifications. Each ticket page shows its activity timeline, and a bell in the header shows each user's unread notifications. |
+| 6 Bonus | Search, pagination, sorting, and filtering on the ticket list. An admin stats dashboard with counts by status, priority, and category, and the mean time to resolve. 183 automated tests and a Postman collection. A React frontend. CI on GitHub Actions. |
 
-Docker runs only the local Postgres. Email notifications and a notification bell in the client were not built. The notification API exists, but the client does not show it.
+Docker runs only the local Postgres. Email notifications were not built.
 
 ## Tech stack
 
